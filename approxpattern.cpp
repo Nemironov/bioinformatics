@@ -6,7 +6,6 @@
 #include <unordered_map>
 using namespace std;
 
-// hello world
 int HammingDistance(string dna1, string dna2)
 {
     int hammingdistance = 0;
@@ -61,23 +60,25 @@ vector<string> Neighbors(string pattern, int d)
     if (d == 0) {
     return vector<string> {pattern};
     }
-    if (pattern.length() == 1) return {"C", "G", "A", "T"};
-
+    if (pattern.length() == 1) return {"A", "C", "G", "T"};
     vector<string> Neighborhood;
     vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
     for (string Text : SuffixNeighbors){
-        cout << "text: " << Text << endl;
-        if (HammingDistance(suffix(pattern), Text) < d){
-            for (int x = 0; x <= 4; x++) {
-                vector<string> nucs=  {"A", "C", "G", "T"};
-                Neighborhood.push_back(Text.insert(0, nucs[x]));
+        if (HammingDistance(suffix(pattern), Text) < d) {
+            vector<string> nucs =  {"A", "C", "G", "T"};
+            for (string nuc : nucs) {
+                cout << "text: " << Text << endl;
+                cout << "nuc: " << nuc << endl;
+                cout << "added nuc:" << nuc + Text << endl; 
+                Neighborhood.push_back(nuc + Text);
             }
         }
         else {
-            string specialtext = Text.insert(1, pattern.substr(0, 1)); 
-            Neighborhood.push_back(specialtext);
+            cout << pattern.substr(0, 1) << ", " << Text << ", " << pattern.substr(0, 1) + Text << endl;
+            Neighborhood.push_back(pattern.substr(0, 1) + Text);
         }     
     }
+    cout << "pattern: " << pattern << endl;
     return Neighborhood;
 }
 // vector<string> FrequentWordsWithMismatches(string dna, int k, int d) {
@@ -108,7 +109,9 @@ int main() {
     vector<int> matches;
     file.open("C:/Users/Nikolai Mironov/Downloads/dataset_30282_4.txt");
     while(file >> pattern >> d)
-    cout << pattern << d << endl;
+    pattern = "ACG";
+    d = 1;
+    cout << pattern << d << " ";
     for (string neighbor : Neighbors(pattern, d)) cout << neighbor << endl;
     return 0;
 }
