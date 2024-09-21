@@ -27,7 +27,7 @@ string opp(string pattern)
     return reversepattern;
 
 }
-pair<string, int> mostfrequent(unordered_map<string, int> freqmap)
+int mostfrequent(unordered_map<string, int> freqmap)
 {
     pair<string, int> themax;
     for (pair<string, int> m : freqmap ) {
@@ -36,7 +36,7 @@ pair<string, int> mostfrequent(unordered_map<string, int> freqmap)
         }
         else themax = m;
     }
-    return themax;
+    return themax.second;
 }
 vector<int> approxpatterncount(string pattern, string dna, int d) {
     vector<int> matches;
@@ -63,7 +63,7 @@ vector<string> Neighbors(string pattern, int d)
     vector<string> Neighborhood;
     vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
     for (string Text : SuffixNeighbors){
-        if (HammingDistance(suffix(pattern), Text) == d) {
+        if (HammingDistance(suffix(pattern), Text) <= d) {
             vector<string> nucs =  {"A", "C", "G", "T"};
             for (string nuc : nucs) {
                 if (nuc != Text) {
@@ -89,13 +89,14 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
         vector<string> neighborhood = Neighbors(pattern, d);
         for (int j = 0; j<= neighborhood.size() - 1; j++) {
             string neighbor = neighborhood[j];
-            if (freqMap[neighbor] != freqMap[neighbor]) freqMap[neighbor] = 1;
+            if (freqMap.empty()) freqMap[neighbor] = 1;
             else freqMap[neighbor] = freqMap[neighbor] + 1;
         }
     }
-    pair<string, int> m = mostfrequent(freqMap);
+    int m = mostfrequent(freqMap);
     for (auto pattern : freqMap){
-        if (pattern.second == m.second) patterns.push_back(pattern.first);
+        if (pattern.second == m) patterns.push_back(pattern.first);
+    }
     return patterns;
 }
 int main() {
