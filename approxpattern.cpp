@@ -27,17 +27,21 @@ string opp(string pattern)
     return reversepattern;
 
 }
-int mostfrequent(unordered_map<string, int> freqmap)
+
+int maxMap(unordered_map<string, int> freqmap)
 {
-    pair<string, int> themax;
-    for (pair<string, int> m : freqmap ) {
-        if (themax.second) {
-            if (m.second > themax.second) themax = m;
-        }
-        else themax = m;
-    }
-    return themax.second;
+    int themax = -1;
+    
+    // for (pair<string, int> m : freqmap ) {
+    //     if (themax != -1) {
+    //         cout << themax << endl;
+    //         if (m.second > themax) themax = m.second;
+    //     }
+    //     else themax = m.second; cout << "new max: " << themax << endl;
+    // }
+    return themax;
 }
+
 vector<int> approxpatterncount(string pattern, string dna, int d) {
     vector<int> matches;
     for (int i = 0; i<dna.length() - pattern.length() + 1; i++) {
@@ -50,35 +54,37 @@ vector<int> approxpatterncount(string pattern, string dna, int d) {
     }
     return matches;
 }
+
 string suffix(string pattern)
 {
-    return pattern.substr(1, pattern.length() - 1 );
+    return pattern.substr(1, pattern.length() - 1);
 }
+
 vector<string> Neighbors(string pattern, int d)
 {
     if (d == 0) {
-    return vector<string> {pattern};
+        return vector<string> {pattern};
     }
     if (pattern.length() == 1) return {"A", "C", "G", "T"}; {
-    vector<string> Neighborhood;
-    vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
-    for (string Text : SuffixNeighbors){
-        if (HammingDistance(suffix(pattern), Text) <= d) {
-            vector<string> nucs =  {"A", "C", "G", "T"};
-            for (string nuc : nucs) {
-                if (nuc != Text) {
-                    Neighborhood.push_back(nuc + Text);
+        vector<string> Neighborhood;
+        vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
+        for (string Text : SuffixNeighbors){
+            if (HammingDistance(suffix(pattern), Text) < d) {
+                vector<string> nucs =  {"A", "C", "G", "T"};
+                for (string nuc : nucs) {
+                    if (nuc != Text) {
+                        Neighborhood.push_back(nuc + Text);
+                    }
                 }
-
             }
+            else {
+                Neighborhood.push_back(pattern.substr(0, 1) + Text);
+            }    
         }
-        else {
-            Neighborhood.push_back(pattern.substr(0, 1) + Text);
-        }     
-    }
-    return Neighborhood;
+        return Neighborhood;
     }
 }
+
 vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
 {
     vector<string> patterns;
@@ -93,9 +99,12 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
             else freqMap[neighbor] = freqMap[neighbor] + 1;
         }
     }
-    int m = mostfrequent(freqMap);
-    for (auto pattern : freqMap){
-        if (pattern.second == m) patterns.push_back(pattern.first);
+    int m = maxMap(freqMap);
+    for (pair<string, int> pattern : freqMap){
+        if (pattern.second == m) {
+            patterns.push_back(pattern.first); 
+            cout << "matching frequency!: " << pattern.second << " " << m << " " << pattern.first << endl; 
+        }
     }
     return patterns;
 }
@@ -106,9 +115,6 @@ int main() {
     int d;
     file.open("C:/Users/Nikolai Mironov/Downloads/dataset_30278_9.txt");
     while(file >> pattern >> k >> d);
-    pattern = "ACGTTGCATGTCGCATGATGCATGAGAGCT";
-    k = 4;
-    d = 1;
     for (string bob : FrequentWordsWithMismatches(pattern, k, d)) {
         cout << bob << " ";
     }
