@@ -114,13 +114,15 @@ int main() {
     string text;
     int k;
     int d;
-    file.open("C:/Users/Nikolai Mironov/Downloads/dataset_30278_9 (1).txt");
-    while(file >> text >> k >> d);
-    text = "ACGTTGCATGTCGCATGATGCATGAGAGCT";
-    k = 4;
+    file.open("C:/Users/maumi/Downlads/dataset_30282_4.txt");
+    while(file >> text >> d);
+    text = "ACG";
     d = 1;
-    for (string bob : FrequentWordsWithMismatches(text, k, d)) {
-        cout << bob << " ";
-    }
+    string a = "TGACCCGTTATGCTCGAGTTCGGTCAGAGCGTCATTGCGAGTAGTCGTTTGCTTTCTCAAACTCC";
+    string b = "GAGCGATTAAGCGTGACAGCCCCAGGGAACCCACAAAACGTGATCGCAGTCCATCCGATCATACA";
+    cout << HammingDistance(a, b) << endl;
+    // for (string bob : Neighbors(text, d)) {
+    //     cout << bob << " ";
+    // }
     return 0;
 }
