@@ -32,13 +32,13 @@ int maxMap(unordered_map<string, int> freqmap)
 {
     int themax = -1;
     
-    // for (pair<string, int> m : freqmap ) {
-    //     if (themax != -1) {
-    //         cout << themax << endl;
-    //         if (m.second > themax) themax = m.second;
-    //     }
-    //     else themax = m.second; cout << "new max: " << themax << endl;
-    // }
+    for (pair<string, int> m : freqmap ) {
+        if (themax != -1) {
+            cout << themax << endl;
+            if (m.second > themax) themax = m.second;
+        }
+        else themax = m.second; cout << "new max: " << themax << endl;
+    }
     return themax;
 }
 
@@ -69,15 +69,16 @@ vector<string> Neighbors(string pattern, int d)
         vector<string> Neighborhood;
         vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
         for (string Text : SuffixNeighbors){
+            cout << suffix(pattern) << ", " << Text << endl;
             if (HammingDistance(suffix(pattern), Text) < d) {
                 vector<string> nucs =  {"A", "C", "G", "T"};
                 for (string nuc : nucs) {
-                    if (nuc != Text) {
-                        Neighborhood.push_back(nuc + Text);
-                    }
+                    cout << "first case: " << nuc + Text << endl;
+                    Neighborhood.push_back(nuc + Text);
                 }
             }
             else {
+                cout << "second case: " << pattern.substr(0, 1) + Text << endl;
                 Neighborhood.push_back(pattern.substr(0, 1) + Text);
             }    
         }
@@ -110,12 +111,15 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
 }
 int main() {
     ifstream file;
-    string pattern;
+    string text;
     int k;
     int d;
-    file.open("C:/Users/Nikolai Mironov/Downloads/dataset_30278_9.txt");
-    while(file >> pattern >> k >> d);
-    for (string bob : FrequentWordsWithMismatches(pattern, k, d)) {
+    file.open("C:/Users/Nikolai Mironov/Downloads/dataset_30278_9 (1).txt");
+    while(file >> text >> k >> d);
+    text = "ACGTTGCATGTCGCATGATGCATGAGAGCT";
+    k = 4;
+    d = 1;
+    for (string bob : FrequentWordsWithMismatches(text, k, d)) {
         cout << bob << " ";
     }
     return 0;
