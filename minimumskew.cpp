@@ -4,12 +4,14 @@
 #include <vector>
 using namespace std;
 
-int main() 
+int main()
 {
-string pattern = "ATTCCAGTACTTCGATGATGGCGTGAAGA"
-int skew = 0;
-
-
-
-
+    string pattern = "ATTCCAGTACTTCGATGATGGCGTGAAGA";
+    int skew = 0;
+    for (char nuc : pattern) {
+        if (nuc == 'G') skew++;
+        else if (nuc == 'C') skew--;
+    }
+    cout << skew << endl;
+    return 0;
 }

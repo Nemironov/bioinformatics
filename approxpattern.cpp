@@ -69,16 +69,13 @@ vector<string> Neighbors(string pattern, int d)
         vector<string> Neighborhood;
         vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
         for (string Text : SuffixNeighbors){
-            cout << suffix(pattern) << ", " << Text << endl;
             if (HammingDistance(suffix(pattern), Text) < d) {
                 vector<string> nucs =  {"A", "C", "G", "T"};
                 for (string nuc : nucs) {
-                    cout << "first case: " << nuc + Text << endl;
                     Neighborhood.push_back(nuc + Text);
                 }
             }
             else {
-                cout << "second case: " << pattern.substr(0, 1) + Text << endl;
                 Neighborhood.push_back(pattern.substr(0, 1) + Text);
             }    
         }
@@ -114,15 +111,10 @@ int main() {
     string text;
     int k;
     int d;
-    file.open("C:/Users/maumi/Downlads/dataset_30282_4.txt");
-    while(file >> text >> d);
-    text = "ACG";
-    d = 1;
-    string a = "TGACCCGTTATGCTCGAGTTCGGTCAGAGCGTCATTGCGAGTAGTCGTTTGCTTTCTCAAACTCC";
-    string b = "GAGCGATTAAGCGTGACAGCCCCAGGGAACCCACAAAACGTGATCGCAGTCCATCCGATCATACA";
-    cout << HammingDistance(a, b) << endl;
-    // for (string bob : Neighbors(text, d)) {
-    //     cout << bob << " ";
-    // }
+    file.open("C:/Users/maumi/Downloads/dataset_30278_9.txt");
+    while(file >> text >> k >> d);
+    for (string bob : FrequentWordsWithMismatches(text, k, d)) {
+        cout << bob << " ";
+    }
     return 0;
 }
