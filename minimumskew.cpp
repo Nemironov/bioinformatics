@@ -4,14 +4,17 @@
 #include <vector>
 using namespace std;
 
-int main()
+int minimumskew(string pattern)
 {
-    string pattern = "ATTCCAGTACTTCGATGATGGCGTGAAGA";
+    int minimum = 0;
     int skew = 0;
-    for (char nuc : pattern) {
+    for (int i = 0; i <= pattern.length(); i++) {
+        char nuc = pattern[i];
         if (nuc == 'G') skew++;
-        else if (nuc == 'C') skew--;
+        else if (nuc == 'C') {
+            skew--;
+            if (skew < minimum) minimum = i;
+        }
     }
-    cout << skew << endl;
-    return 0;
+    return minimum;
 }

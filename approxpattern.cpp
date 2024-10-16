@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <C:\Users\maumi\OneDrive\Documents\GitHub\bioinformatics\minimumskew.cpp>
 using namespace std;
 
 int HammingDistance(string dna1, string dna2)
@@ -15,14 +16,14 @@ int HammingDistance(string dna1, string dna2)
     return hammingdistance;
 }
 
-string opp(string pattern)
+string reversecompliment(string pattern)
 {
     string reversepattern;
-    for (auto base : pattern) {
-        if (base == 'C' ) reversepattern.push_back('G');
-        else if (base == 'G' ) reversepattern.push_back('C');
-        else if (base == 'A' ) reversepattern.push_back('T');
-        else if (base == 'T' ) reversepattern.push_back('A');
+    for (char base : pattern) {
+        if (base == 'C' ) reversepattern.insert(0, 1, 'G');
+        else if (base == 'G' ) reversepattern.insert(0, 1, 'C');
+        else if (base == 'A' ) reversepattern.insert(0, 1, 'T');
+        else if (base == 'T' ) reversepattern.insert(0, 1, 'A');
     }
     return reversepattern;
 
@@ -93,8 +94,10 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
         vector<string> neighborhood = Neighbors(pattern, d);
         for (int j = 0; j<= neighborhood.size() - 1; j++) {
             string neighbor = neighborhood[j];
-            if (freqMap.empty()) freqMap[neighbor] = 1;
-            else freqMap[neighbor] = freqMap[neighbor] + 1;
+            if (freqMap.empty()){
+                freqMap[neighbor] = 1; 
+                freqMap[reversecompliment(neighbor)] = 1;
+            } else freqMap[neighbor] = freqMap[neighbor] + 1; freqMap[reversecompliment(neighbor)] = freqMap[reversecompliment(neighbor)] + 1;
         }
     }
     int m = maxMap(freqMap);
@@ -111,10 +114,14 @@ int main() {
     string text;
     int k;
     int d;
-    file.open("C:/Users/maumi/Downloads/dataset_30278_9.txt");
-    while(file >> text >> k >> d);
-    for (string bob : FrequentWordsWithMismatches(text, k, d)) {
-        cout << bob << " ";
-    }
+    file.open("C:/Users/maumi/Downloads/Salmonella_enterica.txt");
+    while(file >> text);
+    k = 9;
+    d = 1;
+    // string window = text.substr(minimumskew(text), 500);
+    // for (string bob : FrequentWordsWithMismatches(window, k, d)) {
+    //     cout << bob << " ";
+    // }
+    cout << Neighbors("CCAGTCAATG", 1).size() << endl;
     return 0;
 }
