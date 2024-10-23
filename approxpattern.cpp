@@ -109,19 +109,58 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
     }
     return patterns;
 }
+
+vector<string> MotifEnumeration(int k, int d, vector<string> Dna) {
+    vector<string> Patterns;
+    unordered_map<string, int> uniques;
+    string pattern = Dna[0];
+    cout << pattern << endl;
+    int n = pattern.length();
+    for (int i = 0; i <= n - k; i++) {
+        string kmer = pattern.substr(i, k);
+        vector<string> neighborhood = Neighbors(kmer, d);
+        for (int j = 0; j<= neighborhood.size() - 1; j++) {
+            string neighbor = neighborhood[j];
+            bool isfound = true;
+            for (string otherpattern : Dna) {
+                cout << otherpattern << endl;
+                if (otherpattern.find(neighbor) != -1) {
+                    cout << neighbor << " is found in " << otherpattern << endl;
+
+                    continue;
+                }
+                else isfound = false ; break;
+            }
+            if (isfound) uniques[kmer] = 1; break;
+        }
+    } 
+for (pair unique : uniques) Patterns.push_back(unique.first);
+return Patterns;
+}
 int main() {
-    ifstream file;
     string text;
+    string s;
+    string exampleWhitespace = "There is whitespace here";
+    vector<string> dna;
     int k;
     int d;
-    file.open("C:/Users/maumi/Downloads/Salmonella_enterica.txt");
-    while(file >> text);
-    k = 9;
-    d = 1;
-    // string window = text.substr(minimumskew(text), 500);
-    // for (string bob : FrequentWordsWithMismatches(window, k, d)) {
-    //     cout << bob << " ";
-    // }
-    cout << Neighbors("CCAGTCAATG", 1).size() << endl;
+    string word = "";
+    ifstream f("C:/Users/maumi/Downloads/dataset_30302_8.txt");
+    while (getline(f, s)) {
+        
+    }
+        
+    cout << k << endl << d << endl << text << endl;
+    for(auto i = 0; i < text.length(); i++) {
+            if (text.substr(i, 1) != " ") {
+                word += (text.substr(i, 1));
+            }
+            else {
+                dna.push_back(word);
+                word = "";
+            };
+        }
+    for (string pattern : MotifEnumeration(k, d, dna)) cout << pattern << endl;
+
     return 0;
 }
