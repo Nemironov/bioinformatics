@@ -137,19 +137,47 @@ vector<string> MotifEnumeration(int k, int d, vector<string> Dna) {
 for (pair unique : uniques) Patterns.push_back(unique.first);
 return Patterns;
 }
-int main() {
-    string text;
-    string s;
-    string exampleWhitespace = "There is whitespace here";
-    vector<string> dna;
-    int k;
-    int d;
-    string word = "";
-    ifstream f("C:/Users/maumi/Downloads/dataset_30302_8.txt");
-    while (getline(f, s)) {
-        
+
+string readfile(string filename, int line_number) {
+    ifstream file;
+    file.open(filename);
+    // Open the file with the provided filename
+
+    
+    // We'll read in the file one line at a time until we find the line we're 
+    // looking for... current_line will keep track of the current line number 
+    // of the line we're reading in, and line will store the line content/string.
+    int current_line = 0;
+    string line;
+    
+    // Continue to read the file one line at a time, unless we reach the end of 
+    // the file at which point we stop
+    while (!file.eof())
+    {
+        // Increment the current line number being read as we are reading in the 
+        // next line now
+        current_line++;
+
+        // Read the next line from the 'file' into the 'line' string 
+        getline(file, line);
+        // If current line number of the line we've read in matches the line number 
+        // that we're looking for, use break to stop the loop
+        if (current_line == line_number) break;
     }
-        
+    // Close the file as we are done working with it
+    file.close();
+    return line;
+}
+
+int main() {
+    string s;
+    string word = "";
+    string filename = "C:/Users/maumi/Downloads/dataset_30302_8 (2).txt";
+    vector<string> dna;
+    cout << "hello world \n";
+    int k = stoi(readfile(filename, 1));
+    int d = stoi(readfile(filename, 2));
+    string text = readfile(filename, 3);
     cout << k << endl << d << endl << text << endl;
     for(auto i = 0; i < text.length(); i++) {
             if (text.substr(i, 1) != " ") {
@@ -160,6 +188,9 @@ int main() {
                 word = "";
             };
         }
+    for (string w : dna){
+        cout << w << endl;
+    }
     for (string pattern : MotifEnumeration(k, d, dna)) cout << pattern << endl;
 
     return 0;
