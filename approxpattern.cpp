@@ -118,24 +118,27 @@ vector<string> MotifEnumeration(int k, int d, vector<string> Dna) {
     int n = pattern.length();
     for (int i = 0; i <= n - k; i++) {
         string kmer = pattern.substr(i, k);
+        cout << "kmer at position " << i << ": "<< kmer << endl;
         vector<string> neighborhood = Neighbors(kmer, d);
-        for (int j = 0; j<= neighborhood.size() - 1; j++) {
+        for (int j = 0; j <= neighborhood.size() - 1; j++) {
             string neighbor = neighborhood[j];
-            bool isfound = true;
+            int foundcount = 0;
             for (string otherpattern : Dna) {
-                cout << otherpattern << endl;
+                if (otherpattern == pattern) continue;
                 if (otherpattern.find(neighbor) != -1) {
                     cout << neighbor << " is found in " << otherpattern << endl;
-
+                    foundcount++;
                     continue;
                 }
-                else isfound = false ; break;
+                else 
+                    foundcount = 0;
+                    break;
             }
-            if (isfound) uniques[kmer] = 1; break;
+            // if (foundcount == Dna.size() - 1) uniques[kmer] = 1; cout << "matching in all, " << foundcount << Dna.size() << endl;
         }
     } 
-for (pair unique : uniques) Patterns.push_back(unique.first);
-return Patterns;
+    for (pair unique : uniques) Patterns.push_back(unique.first);
+    return Patterns;
 }
 
 string readfile(string filename, int line_number) {
@@ -174,11 +177,9 @@ int main() {
     string word = "";
     string filename = "C:/Users/maumi/Downloads/dataset_30302_8 (2).txt";
     vector<string> dna;
-    cout << "hello world \n";
     int k = stoi(readfile(filename, 1));
     int d = stoi(readfile(filename, 2));
     string text = readfile(filename, 3);
-    cout << k << endl << d << endl << text << endl;
     for(auto i = 0; i < text.length(); i++) {
             if (text.substr(i, 1) != " ") {
                 word += (text.substr(i, 1));
@@ -191,7 +192,8 @@ int main() {
     for (string w : dna){
         cout << w << endl;
     }
-    for (string pattern : MotifEnumeration(k, d, dna)) cout << pattern << endl;
+    vector<string> patterns = MotifEnumeration(k, d, dna);
+    for (string pattern : patterns) cout << pattern << " ";
 
     return 0;
 }
