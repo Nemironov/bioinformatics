@@ -116,28 +116,40 @@ vector<string> MotifEnumeration(int k, int d, vector<string> Dna) {
     string pattern = Dna[0];
     cout << pattern << endl;
     int n = pattern.length();
+    unordered_map<string, int> foundcounts;
     for (int i = 0; i <= n - k; i++) {
         string kmer = pattern.substr(i, k);
         cout << "kmer at position " << i << ": "<< kmer << endl;
         vector<string> neighborhood = Neighbors(kmer, d);
         for (int j = 0; j <= neighborhood.size() - 1; j++) {
             string neighbor = neighborhood[j];
-            int foundcount = 0;
+            cout << "from neighborhood set of " << kmer << ":" << neighbor << endl;
             for (string otherpattern : Dna) {
                 if (otherpattern == pattern) continue;
                 if (otherpattern.find(neighbor) != -1) {
-                    cout << neighbor << " is found in " << otherpattern << endl;
-                    foundcount++;
-                    continue;
+                    cout << neighbor << " is found in " << otherpattern << " foundcount for " << kmer << " is: " << foundcounts[kmer] + 1 << endl;
+                    if (foundcounts[kmer]) {
+                        foundcounts[kmer]++;
+                    }
+                    else
+                        foundcounts[kmer] = 1;
                 }
-                else 
-                    foundcount = 0;
-                    break;
+                else {
+                    cout << neighbor << " not found in pattern: " << otherpattern << endl;
+                }
             }
-            // if (foundcount == Dna.size() - 1) uniques[kmer] = 1; cout << "matching in all, " << foundcount << Dna.size() << endl;
         }
-    } 
-    for (pair unique : uniques) Patterns.push_back(unique.first);
+        for (pair foundcount : foundcounts) {
+            if (foundcount.second == Dna.size()) {
+                uniques[foundcount.first] = 1; cout << "foundcount: " << foundcount.first << " " << foundcount.second << " matching in all " << Dna.size() << endl;
+            }
+        } 
+    
+    }
+    for (pair unique : uniques) { 
+        cout << unique.first << endl;
+        Patterns.push_back(unique.first); 
+    }
     return Patterns;
 }
 
@@ -175,7 +187,7 @@ string readfile(string filename, int line_number) {
 int main() {
     string s;
     string word = "";
-    string filename = "C:/Users/maumi/Downloads/dataset_30302_8 (2).txt";
+    string filename = "C:/Users/maumi/Downloads/input_1.txt";
     vector<string> dna;
     int k = stoi(readfile(filename, 1));
     int d = stoi(readfile(filename, 2));
@@ -192,6 +204,7 @@ int main() {
     for (string w : dna){
         cout << w << endl;
     }
+    cout << "length: " << k << " mismatches: " << d << endl;
     vector<string> patterns = MotifEnumeration(k, d, dna);
     for (string pattern : patterns) cout << pattern << " ";
 
