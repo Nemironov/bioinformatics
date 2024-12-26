@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include <C:\Users\maumi\OneDrive\Documents\GitHub\bioinformatics\minimumskew.cpp>
+#include "minimumskew.cpp"
 using namespace std;
 
 int HammingDistance(string dna1, string dna2)
