@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
-#include "minimumskew.cpp"
 using namespace std;
 
 int HammingDistance(string dna1, string dna2)
@@ -42,7 +41,20 @@ int maxMap(unordered_map<string, int> freqmap)
     }
     return themax;
 }
-
+int minimumskew(string pattern)
+{
+    int minimum = 0;
+    int skew = 0;
+    for (int i = 0; i <= pattern.length(); i++) {
+        char nuc = pattern[i];
+        if (nuc == 'G') skew++;
+        else if (nuc == 'C') {
+            skew--;
+            if (skew < minimum) minimum = i;
+        }
+    }
+    return minimum;
+}
 //vector<int> approxpatterncount(string pattern, string dna, int d) {
 //    vector<int> matches;
 //    for (int i = 0; i<dna.length() - pattern.length() + 1; i++) {
@@ -61,25 +73,32 @@ string suffix(string pattern)
     return pattern.substr(1, pattern.length() - 1);
 }
 
-vector<string> Neighbors(string pattern, int d)
+vector<string> Neighbors(string kmer, int d)
 {
+    string kmer0 = kmer;
+    
     if (d == 0) {
-        return vector<string> {pattern};
+        return vector<string> {kmer};
     }
-    if (pattern.length() == 1) return {"A", "C", "G", "T"}; {
+    if (kmer.length() == 1) return {"A", "C", "G", "T"}; {
         vector<string> Neighborhood;
-        vector<string> SuffixNeighbors = Neighbors(suffix(pattern), d);
-        for (string Text : SuffixNeighbors){
-            if (HammingDistance(suffix(pattern), Text) < d) {
+        vector<string> SuffixNeighbors = Neighbors(suffix(kmer), d);
+        for (string text : SuffixNeighbors){
+            if (HammingDistance(suffix(kmer), text) < d) {
                 vector<string> nucs =  {"A", "C", "G", "T"};
+                    
                 for (string nuc : nucs) {
-                    Neighborhood.push_back(nuc + Text);
+                        Neighborhood.push_back(nuc + text);
                 }
             }
             else {
-                Neighborhood.push_back(pattern.substr(0, 1) + Text);
-            }    
+                    Neighborhood.push_back(kmer.substr(0, 1) + text);
+            }
         }
+        
+        //remove original kmer
+//        auto itr = find(Neighborhood.begin(), Neighborhood.end(), kmer);
+//        if (itr != Neighborhood.end()) Neighborhood.erase(itr);
         return Neighborhood;
     }
 }
@@ -110,46 +129,144 @@ vector<string> FrequentWordsWithMismatches(string dna, int k, int d)
     return patterns;
 }
 
+unordered_map<string, unordered_map<string, vector<string>>> larynxMap(int k, int d, vector<string> Dna) {
+    
+    cout << "Dna size: " << Dna.size() << endl;
+    unordered_map<string, unordered_map<string, vector<string>>> dnaMap;
+    string kmerFinal;
+    for (string currentElement : Dna){
+        long n = currentElement.length();
+        unordered_map<string, vector<string>> kmerMap;
+        for (int i = 0; i <= n - k ; i++) {
+            string kmer = currentElement.substr(i, k);
+            kmerFinal = kmer;
+            kmerMap[kmer] = Neighbors(kmer, d);
+            
+        }
+        dnaMap[currentElement] = kmerMap;
+    }
+    cout << "larynxMap(" << dnaMap.size() << "): " << endl;
+    for (auto pair1 : dnaMap) {
+       cout << pair1.first << endl;
+        for (auto pair2 : pair1.second) {
+            //cout << pair1.first << endl;
+            
+            string neighborString;
+            for (auto neightbor : pair2.second) {
+                neighborString += neightbor + " ";
+            }
+            cout << "\t" << pair2.first << ": " << neighborString << endl;
+        }
+    }
+    
+    return dnaMap;
+}
+
 vector<string> MotifEnumeration(int k, int d, vector<string> Dna) {
     vector<string> Patterns;
-    unordered_map<string, int> uniques;
-    string pattern = Dna[0];
-    cout << pattern << endl;
-    __SIZE_TYPE__ n = pattern.length();
-    unordered_map<string, int> foundcounts;
-    for (int i = 0; i <= n - k; i++) {
-        string kmer = pattern.substr(i, k);
-        cout << "kmer at position " << i << ": "<< kmer << endl;
-        vector<string> neighborhood = Neighbors(kmer, d);
-        for (int j = 0; j <= neighborhood.size() - 1; j++) {
-            string neighbor = neighborhood[j];
-            cout << "from neighborhood set of " << kmer << ":" << neighbor << endl;
-            for (string otherpattern : Dna) {
-                if (otherpattern == pattern) continue;
-                if (otherpattern.find(neighbor) != -1) {
-                    cout << neighbor << " is found in " << otherpattern << " foundcount for " << kmer << " is: " << foundcounts[kmer] + 1 << endl;
-                    if (foundcounts[kmer]) {
-                        foundcounts[kmer]++;
+    
+    //generate larynx array
+    unordered_map<string, unordered_map<string, vector<string>>> dnaMap = larynxMap(k, d, Dna);
+    
+    //take the first element of the array, take the source kmer
+    string firstElementKey = dnaMap.begin()->first;
+    cout << firstElementKey << endl;
+    for (auto currentElement : dnaMap) {
+        
+        
+        if (currentElement.first != firstElementKey) {
+            cout << "\ncurrentElement: " << currentElement.first << endl;
+            bool kmerMatchFound = false;
+            for (auto currentKmer : currentElement.second) {
+                cout << "\tcurrentKmer: " << currentKmer.first << endl;
+                if (!kmerMatchFound) {
+                    bool neighborMatchFound = false;
+                    for (auto neighbor : currentKmer.second) {
+                        if (!neighborMatchFound) {
+                            
+                            for (auto firstKmer : dnaMap[firstElementKey]) {
+                                //                        cout << "\t\tfirstKmer: " << firstKmer.first << endl;
+                                
+                                for (auto firstNeighbor : firstKmer.second) {
+                                    if (neighbor == firstNeighbor) {
+                                        //TODO fix the double matches, we dont want double matches because its not breaking right
+                                        cout << "\t\tneighbor match! " << neighbor << "=" << firstNeighbor << endl;
+                                        kmerMatchFound = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            break;
+                        }
                     }
-                    else
-                        foundcounts[kmer] = 1;
+                } else {
+                    break;
                 }
-                else {
-                    cout << neighbor << " not found in pattern: " << otherpattern << endl;
-                }
+        }
+        
+        }
+    }
+        //for each kmer, take neighbor array and compare to neighbor array of other elements
+        //if match, stop processing neighbor, stop processing test kmer, stop processing this element
+        //mark element as count + 1
+        //move to next element
+        //at the end,
+    //if all three match, add source kmer to output array
+    return Patterns;
+}
+vector<string> MotifEnumerationx(int k, int d, vector<string> Dna) {
+    vector<string> Patterns;
+    unordered_map<string, int> uniques;
+    unordered_map<string, int> foundcounts;
+    
+    for (string current_pattern : Dna) {
+        
+        cout << "\ncurrent pattern: " << current_pattern << endl;
+        
+        __SIZE_TYPE__ n = current_pattern.length();
+        
+        // iterate through each position of pattern
+        for (int i = 0; i <= n - k; i++) {
+            
+            //get kmer of that position
+            string kmer = current_pattern.substr(i, k);
+            cout << "kmer at position " << i << ": "<< kmer << endl;
+            
+            vector<string> neighborhood = Neighbors(kmer, d);
+            for (int j = 0; j <= neighborhood.size() - 1; j++) {
+                string neighbor = neighborhood[j];
+                cout << "from neighborhood set of " << kmer << ": " << neighbor << endl;
+
+                                for (string otherpattern : Dna) {
+                                    if (otherpattern == current_pattern) continue;
+                                    // if neighbor found in other pattern
+                                    if (otherpattern.find(neighbor) != -1) {
+                                        foundcounts[neighbor]++;
+                                        cout << neighbor << " is found in " << otherpattern << " foundcount for " << neighbor << " is: " << foundcounts[neighbor] << endl;
+                                        continue;
+                                    }
+                                    else {
+                                        cout << neighbor << " not found in pattern: " << otherpattern << endl;
+                                        break;
+                                    }
+                                }
             }
         }
-        for (pair foundcount : foundcounts) {
-            if (foundcount.second == Dna.size()) {
-                uniques[foundcount.first] = 1; cout << "foundcount: " << foundcount.first << " " << foundcount.second << " matching in all " << Dna.size() << endl;
+            for (pair foundcount : foundcounts) {
+                if (foundcount.second > Dna.size()) {
+                    uniques[foundcount.first] = 1;
+                    cout << "foundcount: " << foundcount.first << " " << foundcount.second << " matches in all " << Dna.size() << endl;
+                }
             }
-        } 
-    
+            
+        
     }
-    for (pair unique : uniques) { 
+    for (pair unique : uniques) {
         cout << unique.first << endl;
-        Patterns.push_back(unique.first); 
+        Patterns.push_back(unique.first);
     }
+    
     return Patterns;
 }
 
@@ -187,26 +304,56 @@ string readfile(string filename, int line_number) {
 int main() {
     string s;
     string word = "";
-    string filename = "C:/Users/maumi/Downloads/input_1.txt";
-    vector<string> dna;
-    int k = stoi(readfile(filename, 1));
-    int d = stoi(readfile(filename, 2));
-    string text = readfile(filename, 3);
-    for(auto i = 0; i < text.length(); i++) {
-            if (text.substr(i, 1) != " ") {
-                word += (text.substr(i, 1));
-            }
-            else {
-                dna.push_back(word);
-                word = "";
-            };
-        }
-    for (string w : dna){
-        cout << w << endl;
+    string filename = "/Users/nikolaimironov/Documents/MotifEnumeration/inputs/input_1.txt";
+    string right_output = readfile("/Users/nikolaimironov/Documents/MotifEnumeration/outputs/output_1.txt", 1);
+    cout <<  readfile(filename, 1) << endl;
+    
+    // parse line1 to k and d
+    string line1 = readfile(filename, 1);
+    vector<string> parameters;
+    
+    int k;
+    int d;
+    long start, end;
+    start = end = 0;
+    char delimiter = ' ';//space
+    while ((start = line1.find_first_not_of(delimiter, end)) != string::npos) {
+        end = line1.find(delimiter, start);
+        parameters.push_back(line1.substr(start, end - start));
+        
     }
-    cout << "length: " << k << " mismatches: " << d << endl;
+    
+    k = stoi(parameters[0]);
+    d = stoi(parameters[1]);
+    
+    
+    //parse line2 to dna vector string
+    vector<string> dna;
+    string line2 = readfile(filename, 3);
+    start = end = 0;
+    while ((start = line2.find_first_not_of(delimiter, end)) != string::npos) {
+        end = line2.find(delimiter, start);
+        dna.push_back(line2.substr(start, end - start));
+        
+    }
+    
+    for (int i = 0; i < dna.size(); i++) {
+        cout << dna[i] << endl;
+    }
+    
+//    string text;
+//    for (auto i = 0; i <= text.length(); i++) {
+//            if (text.substr(i, 1) != " ") {
+//                word += (text.substr(i, 1));
+//            }
+//            else {
+//                dna.push_back(word);
+//                word = "";
+//            };
+//        }
     vector<string> patterns = MotifEnumeration(k, d, dna);
     for (string pattern : patterns) cout << pattern << " ";
+    cout << endl << "debug output: " << right_output << endl;
 
     return 0;
 }
