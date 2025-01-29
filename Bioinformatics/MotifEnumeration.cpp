@@ -253,7 +253,7 @@ vector<string> MotifEnumerationx(int k, int d, vector<string> Dna) {
                                 }
             }
         }
-            for (pair foundcount : foundcounts) {
+            for (pair<string, int> foundcount : foundcounts) {
                 if (foundcount.second > Dna.size()) {
                     uniques[foundcount.first] = 1;
                     cout << "foundcount: " << foundcount.first << " " << foundcount.second << " matches in all " << Dna.size() << endl;
@@ -262,7 +262,7 @@ vector<string> MotifEnumerationx(int k, int d, vector<string> Dna) {
             
         
     }
-    for (pair unique : uniques) {
+    for (pair<string, int> unique : uniques) {
         cout << unique.first << endl;
         Patterns.push_back(unique.first);
     }
@@ -270,33 +270,21 @@ vector<string> MotifEnumerationx(int k, int d, vector<string> Dna) {
     return Patterns;
 }
 
-string readfile(string filename, int line_number) {
-    ifstream file;
-    file.open(filename);
-    // Open the file with the provided filename
-
-    
-    // We'll read in the file one line at a time until we find the line we're 
-    // looking for... current_line will keep track of the current line number 
-    // of the line we're reading in, and line will store the line content/string.
-    int current_line = 0;
-    string line;
-    
-    // Continue to read the file one line at a time, unless we reach the end of 
-    // the file at which point we stop
-    while (!file.eof())
-    {
-        // Increment the current line number being read as we are reading in the 
-        // next line now
-        current_line++;
-
-        // Read the next line from the 'file' into the 'line' string 
-        getline(file, line);
-        // If current line number of the line we've read in matches the line number 
-        // that we're looking for, use break to stop the loop
-        if (current_line == line_number) break;
+string readfile(const string& filename, int lineNumber) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Error: Could not open the file " << filename << endl;
+        return "";
     }
-    // Close the file as we are done working with it
+
+    string line;
+    for (int i = 0; i < lineNumber; ++i) {
+        if (!getline(file, line)) {
+            cerr << "Error: Could not read line " << lineNumber << " from file " << filename << endl;
+            return "";
+        }
+    }
+
     file.close();
     return line;
 }
@@ -304,42 +292,48 @@ string readfile(string filename, int line_number) {
 int main() {
     string s;
     string word = "";
-    string filename = "/Users/nikolaimironov/Documents/MotifEnumeration/inputs/input_1.txt";
-    string right_output = readfile("/Users/nikolaimironov/Documents/MotifEnumeration/outputs/output_1.txt", 1);
+    string filename = "/Users/nikolaimironov/bioinformatics/Bioinformatics/input_1.txt";
+    string right_output = readfile("/Users/nikolaimironov/bioinformatics/Bioinformatics/output_1.txt", 1);
     cout <<  readfile(filename, 1) << endl;
     
-    // parse line1 to k and d
+        // parse line1 to k and d
     string line1 = readfile(filename, 1);
+    cout << "Line1: " << line1 << endl;
+
     vector<string> parameters;
-    
-    int k;
-    int d;
-    long start, end;
-    start = end = 0;
+    int k, d;
+    size_t start = 0, end = 0;
     char delimiter = ' ';//space
     while ((start = line1.find_first_not_of(delimiter, end)) != string::npos) {
         end = line1.find(delimiter, start);
         parameters.push_back(line1.substr(start, end - start));
-        
     }
-    
+
+    if (parameters.size() < 2) {
+        cerr << "Error: Not enough parameters in line1" << endl;
+        return 1;
+    }
+
     k = stoi(parameters[0]);
     d = stoi(parameters[1]);
-    
-    
-    //parse line2 to dna vector string
+    cout << "k: " << k << ", d: " << d << endl;
+
+    // parse line2 to dna vector string
     vector<string> dna;
-    string line2 = readfile(filename, 3);
+    string line2 = readfile(filename, 2);
+    cout << "Line2: " << line2 << endl;
+
     start = end = 0;
     while ((start = line2.find_first_not_of(delimiter, end)) != string::npos) {
         end = line2.find(delimiter, start);
         dna.push_back(line2.substr(start, end - start));
-        
     }
-    
-    for (int i = 0; i < dna.size(); i++) {
-        cout << dna[i] << endl;
+
+    cout << "DNA vector: ";
+    for (const auto& seq : dna) {
+        cout << seq << " ";
     }
+    cout << endl;
     
 //    string text;
 //    for (auto i = 0; i <= text.length(); i++) {
